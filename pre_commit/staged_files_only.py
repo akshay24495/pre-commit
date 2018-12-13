@@ -6,6 +6,7 @@ import logging
 import os.path
 import time
 
+from pre_commit import git
 from pre_commit.util import CalledProcessError
 from pre_commit.util import cmd_output
 from pre_commit.util import mkdirp
@@ -29,6 +30,9 @@ def staged_files_only(patch_dir):
     context.
     """
     # Determine if there are unstaged files
+    relevant_files = git.modified_staged_files()
+    import pdb; pdb.set_trace()
+
     tree = cmd_output('git', 'write-tree')[1].strip()
     retcode, diff_stdout_binary, _ = cmd_output(
         'git', 'diff-index', '--ignore-submodules', '--binary',

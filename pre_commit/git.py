@@ -90,6 +90,23 @@ def get_staged_files():
     )[1])
 
 
+def modified_staged_files():
+    _, stdout_binary, _ = cmd_output('git', 'status', '--porcelain', '-z')
+    parts = list(reversed(zsplit(stdout_binary)))
+    retv = set()
+    while parts:
+        line = parts.pop()
+        status, filename = line[:3], line[3:]
+        if status[0] in {'C', 'R'}:  # renames / moves have an additional arg
+            parts.pop()
+        if status[1] == 'A':
+            # skip `git add --intent-to-add` files
+            continue
+        elif status[1].strip():
+            retv.add(filename)
+    return retv
+
+
 def get_all_files():
     return zsplit(cmd_output('git', 'ls-files', '-z')[1])
 
